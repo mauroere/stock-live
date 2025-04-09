@@ -1,0 +1,235 @@
+openapi: 3.0.0
+info:
+  title: Stock Live API
+  version: 1.0.0
+  description: API para la gestión de ventas y stock en tiempo real
+
+servers:
+  - url: /api
+    description: API base URL
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Mensaje de error
+        code:
+          type: string
+          description: Código de error interno
+
+    SalesOverview:
+      type: object
+      properties:
+        totalRevenue:
+          type: number
+          description: Ingresos totales en el período
+        comparisonPercentage:
+          type: number
+          description: Porcentaje de comparación con período anterior
+        orderCount:
+          type: integer
+          description: Cantidad total de órdenes
+        avgOrderValue:
+          type: number
+          description: Valor promedio por orden
+
+    SalesTrend:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+          description: Fecha de la venta
+        revenue:
+          type: number
+          description: Ingresos del día
+
+    ProductSale:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID del producto
+        name:
+          type: string
+          description: Nombre del producto
+        sales:
+          type: integer
+          description: Cantidad de unidades vendidas
+        revenue:
+          type: number
+          description: Ingresos generados por el producto
+
+    CategorySale:
+      type: object
+      properties:
+        category:
+          type: string
+          description: Nombre de la categoría
+        total:
+          type: number
+          description: Total de ventas en la categoría
+
+    PaymentMethod:
+      type: object
+      properties:
+        method:
+          type: string
+          description: Método de pago
+        total:
+          type: number
+          description: Total procesado por este método
+
+paths:
+  /sales/overview:
+    get:
+      summary: Obtiene el resumen general de ventas
+      parameters:
+        - in: query
+          name: startDate
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Fecha de inicio del período
+        - in: query
+          name: endDate
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Fecha de fin del período
+      responses:
+        '200':
+          description: Resumen de ventas obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOverview'
+        '400':
+          description: Parámetros inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /sales/trend:
+    get:
+      summary: Obtiene la tendencia de ventas por día
+      parameters:
+        - in: query
+          name: startDate
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Fecha de inicio del período
+        - in: query
+          name: endDate
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Fecha de fin del período
+      responses:
+        '200':
+          description: Tendencia de ventas obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SalesTrend'
+
+  /sales/products:
+    get:
+      summary: Obtiene las ventas por producto
+      parameters:
+        - in: query
+          name: startDate
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Fecha de inicio del período
+        - in: query
+          name: endDate
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Fecha de fin del período
+      responses:
+        '200':
+          description: Ventas por producto obtenidas exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductSale'
+
+  /sales/categories:
+    get:
+      summary: Obtiene las ventas por categoría
+      parameters:
+        - in: query
+          name: startDate
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Fecha de inicio del período
+        - in: query
+          name: endDate
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Fecha de fin del período
+      responses:
+        '200':
+          description: Ventas por categoría obtenidas exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CategorySale'
+
+  /sales/payment-methods:
+    get:
+      summary: Obtiene las ventas por método de pago
+      parameters:
+        - in: query
+          name: startDate
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Fecha de inicio del período
+        - in: query
+          name: endDate
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Fecha de fin del período
+      responses:
+        '200':
+          description: Ventas por método de pago obtenidas exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentMethod'
